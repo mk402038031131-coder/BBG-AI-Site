@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BBG AI – Free AI Website Builder, App Builder & Chat | मुफ़्त AI टूल्स</title>
+<meta name="description" content="BBG AI: free AI tools in Hindi and English – chat, website builder, Android app builder, coding, translator, story, documents and more. मुफ़्त AI टूल्स।">
+<meta property="og:title" content="BBG AI – Free AI Studios">
+<meta property="og:description" content="Free AI website builder, app builder, chat and more in Hindi & English.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://bbg-ai-platform.netlify.app/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"BBG AI","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"inLanguage":["hi","en"]}</script>
+<style>
+:root{--bg:#0a0a1a;--card:#14142b;--line:#26264a;--ac:#8b5cf6;--tx:#f1f1f8;--mu:#9a9ab5}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;display:flex;flex-direction:column}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+header b{font-size:18px}header b span{color:var(--ac)}
+select,button,textarea{font:inherit}
+#kb{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px 9px}#lang{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px}
+#tabs{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid var(--line)}
+#tabs button{flex:none;background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:20px;padding:7px 14px}
+#tabs button.on{background:var(--ac);border-color:var(--ac)}
+#hint{padding:8px 14px;color:var(--mu);font-size:14px}
+#out{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:92%;padding:10px 13px;border-radius:14px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+.u{align-self:flex-end;background:var(--ac)}.b{align-self:flex-start;background:var(--card)}.e{color:#ff8a8a}
+.m iframe{width:100%;height:55vh;border:0;background:#fff;border-radius:8px;margin-top:6px}
+.act{display:flex;gap:8px;margin-top:8px}.act button{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:6px 12px}
+#bar{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+#in{flex:1;resize:none;height:48px;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:16px}
+#go{border:0;border-radius:12px;background:var(--ac);color:#fff;padding:0 18px;font-weight:600}#go:disabled{opacity:.5}
+footer{text-align:center;color:var(--mu);font-size:12px;padding:4px 0 8px}
+</style>
+</head>
+<body>
+<header><b>BBG <span>AI</span></b>
+<span><button id="kb" title="API key">🔑</button> <select id="lang"><option value="hi">हिंदी</option><option value="en">English</option></select></span></header>
+<nav id="tabs"></nav>
+<div id="hint"></div>
+<main id="out"></main>
+<div id="bar"><textarea id="in"></textarea><button id="go"></button></div>
+<footer id="ft"></footer>
+<script>
+const T=[["chat","चैट","Chat","कुछ भी पूछें","Ask anything"],
+["website","वेबसाइट बिल्डर","Website Builder","बताएं कैसी वेबसाइट चाहिए, मैं बना दूँगा","Describe the website you want"],
+["android","ऐप बिल्डर","App Builder","बताएं कैसा Android ऐप चाहिए (कोड मिलेगा, Android Studio में फ्री बनाएं)","Describe the Android app (you get code; build free in Android Studio)"],
+["coding","कोडिंग","Coding","कोड लिखवाएं या ठीक करवाएं","Write or fix code"],
+["translator","अनुवादक","Translator","टेक्स्ट लिखें, भाषा बताएं","Paste text and name the language"],
+["story","कहानी","Story","कहानी का विचार लिखें","Give a story idea"],
+["document","दस्तावेज़","Document","पत्र, रिपोर्ट, रिज़्यूमे आदि","Letter, report, resume…"],
+["presentation","प्रेज़ेंटेशन","Presentation","विषय बताएं","Give a topic"],
+["education","शिक्षा","Education","कोई भी विषय समझें","Learn any topic"],
+["business","बिज़नेस","Business","बिज़नेस आइडिया या सलाह","Business ideas & advice"],
+["music","गीत","Music","गीत के बोल और धुन","Lyrics and melody ideas"],
+["video","वीडियो स्क्रिप्ट","Video Script","स्क्रिप्ट और स्टोरीबोर्ड","Script and storyboard"],
+["image","इमेज स्टूडियो","Image Studio","बताएं कैसी तस्वीर चाहिए","Describe the picture you want"]];
+const S={hi:{send:"भेजें",ph:"यहाँ लिखें…",copy:"कॉपी",dl:"डाउनलोड .html",err:"त्रुटि: ",ft:"पूरी तरह मुफ़्त · रोज़ की सीमा लागू"},
+en:{send:"Send",ph:"Type here…",copy:"Copy",dl:"Download .html",err:"Error: ",ft:"Completely free · daily limit applies"}};
+let lang="hi",cur="chat",hist=[];
+try{lang=localStorage.getItem("bbg_lang")||"hi"}catch(e){}
+const $=id=>document.getElementById(id);
+function ui(){const s=S[lang],i=lang==="hi"?1:2;
+document.documentElement.lang=lang;$("lang").value=lang;$("go").textContent=s.send;$("in").placeholder=s.ph;$("ft").textContent=s.ft;
+$("tabs").innerHTML="";T.forEach(t=>{const b=document.createElement("button");b.textContent=t[i];if(t[0]===cur)b.className="on";
+b.onclick=()=>{cur=t[0];ui()};$("tabs").appendChild(b)});
+const c=T.find(t=>t[0]===cur);$("hint").textContent=c[lang==="hi"?3:4]}
+$("lang").onchange=e=>{lang=e.target.value;try{localStorage.setItem("bbg_lang",lang)}catch(x){}ui()};
+function add(text,cls){const d=document.createElement("div");d.className="m "+cls;d.textContent=text;$("out").appendChild(d);$("out").scrollTop=1e9;return d}
+function clean(t){return t.replace(/^```[a-z]*\s*\n?/i,"").replace(/\n?```\s*$/,"")}
+function acts(d,text,dl){const a=document.createElement("div");a.className="act";
+const c=document.createElement("button");c.textContent=S[lang].copy;c.onclick=()=>navigator.clipboard.writeText(text);a.appendChild(c);
+if(dl){const b=document.createElement("button");b.textContent=S[lang].dl;b.onclick=()=>{const l=document.createElement("a");
+l.href=URL.createObjectURL(new Blob([text],{type:"text/html"}));l.download="my-website.html";l.click()};a.appendChild(b)}
+d.appendChild(a)}
+const P={chat:"You are BBG AI Chat Studio, a friendly helpful assistant. Be clear and concise.",
+website:"You are a web developer. Output ONLY one complete, self-contained, responsive HTML file (inline CSS and JS, no external files, no markdown fences, no explanation). Modern mobile-first design with title and meta description.",
+android:"You are an Android developer. Output a complete Kotlin + Jetpack Compose app: each file with its path as heading (build.gradle.kts dependencies, MainActivity.kt, screens), code blocks, then 3 short steps to build it in Android Studio.",
+coding:"You are an expert coding assistant. Give working code with a short explanation.",
+translator:"You are a translator. Translate into the language the user names; if none, Hindi to English and anything else to Hindi. Output only the translation.",
+story:"You are a creative story writer. Write an engaging story for the idea.",
+document:"You are a document writer. Produce a well-structured, ready-to-use document for the request.",
+presentation:"You are a presentation maker. Give a slide-by-slide outline: title, 3-5 bullets, short speaker note.",
+education:"You are a patient teacher. Explain step by step in simple words with examples, then 3 practice questions.",
+business:"You are a business advisor. Give practical, low-cost, actionable advice.",
+music:"You are a songwriter. Write original lyrics (verses, chorus) and describe melody, tempo, mood. Never copy existing songs.",
+video:"You are a video scriptwriter. Give a script and scene-by-scene storyboard (scene, visuals, voiceover, duration)."};
+const key=()=>{try{return localStorage.getItem("bbg_key")||""}catch(e){return ""}};
+$("kb").onclick=()=>{const v=prompt(lang==="hi"?"वैकल्पिक: Pollinations API key (enter.pollinations.ai से मुफ़्त). खाली छोड़ें तो बिना key चलेगा.":"Optional: Pollinations API key (free at enter.pollinations.ai). Leave empty to try without.",key());
+if(v!==null)try{localStorage.setItem("bbg_key",v.trim())}catch(e){}};
+async function ask(messages){let last="";
+for(const u of ["https://gen.pollinations.ai/v1/chat/completions","https://text.pollinations.ai/openai"]){
+try{const h={"Content-Type":"application/json"};if(key())h.Authorization="Bearer "+key();
+const r=await fetch(u,{method:"POST",headers:h,body:JSON.stringify({model:"openai",messages})});
+if(r.ok){const d=await r.json();const t=d.choices?.[0]?.message?.content;if(t)return t;last="empty reply"}
+else last=(r.status===401||r.status===403)?(lang==="hi"?"key चाहिए: 🔑 बटन दबाकर enter.pollinations.ai की मुफ़्त key डालें":"key needed: tap 🔑 and paste a free key from enter.pollinations.ai"):"HTTP "+r.status}
+catch(e){last=e.message}}
+throw new Error(last)}
+async function send(){const m=$("in").value.trim();if(!m)return;$("in").value="";add(m,"u");const w=add("…","b");$("go").disabled=true;
+try{if(cur==="image"){w.textContent="";const im=document.createElement("img");im.style.cssText="width:100%;border-radius:8px";
+im.onerror=()=>{w.textContent=S[lang].err+(lang==="hi"?"इमेज नहीं बनी (🔑 key डालकर देखें)":"image failed (try adding a 🔑 key)");w.classList.add("e")};
+im.src="https://gen.pollinations.ai/image/"+encodeURIComponent(m)+"?width=768&height=768&nologo=true"+(key()?"&key="+encodeURIComponent(key()):"");w.appendChild(im)}
+else{const sys=P[cur]+" Reply in "+(lang==="hi"?"Hindi":"English")+" unless the user writes in another language.";
+const msgs=[{role:"system",content:sys},...(cur==="chat"?hist.slice(-16).map(x=>({role:x.role==="model"?"assistant":"user",content:x.text})):[]),{role:"user",content:m}];
+const reply=await ask(msgs);
+if(cur==="website"){const h=clean(reply);w.textContent="";const f=document.createElement("iframe");f.sandbox="allow-scripts";f.srcdoc=h;w.appendChild(f);acts(w,h,true)}
+else{w.textContent=reply;acts(w,reply,false);if(cur==="chat")hist.push({role:"user",text:m},{role:"model",text:reply})}}}
+catch(e){w.textContent=S[lang].err+e.message;w.classList.add("e")}
+$("go").disabled=false}
+$("go").onclick=send;
+ui();
+</script>
+</body>
+</html>

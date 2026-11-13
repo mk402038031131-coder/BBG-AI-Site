@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bbg-ai-platform.netlify.app/sitemap.xml
